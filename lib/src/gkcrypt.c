@@ -386,13 +386,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_gkcrypt_gmac(ChiakiGKCrypt *gkcrypt, uint64
 		return CHIAKI_ERR_UNKNOWN;
 	}
 
-	// encrypt without additional data
-	if(mbedtls_gcm_starts(&actx, MBEDTLS_GCM_ENCRYPT, iv, CHIAKI_GKCRYPT_BLOCK_SIZE) != 0)
-	{
-		mbedtls_gcm_free(&actx);
-		return CHIAKI_ERR_UNKNOWN;
-	}
-	// set "additional data" only whitout input nor output
+	// set "additional data" only without input nor output
 	// to get the same result as:
 	// EVP_EncryptUpdate(ctx, NULL, &len, buf, (int)buf_size)
 	if(mbedtls_gcm_crypt_and_tag(&actx, MBEDTLS_GCM_ENCRYPT,

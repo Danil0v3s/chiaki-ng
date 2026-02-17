@@ -53,9 +53,14 @@
 #include <json-c/json_object.h>
 #include <json-c/json_tokener.h>
 #include <json-c/json_pointer.h>
+#if CHIAKI_ENABLE_UPNP
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 #include <miniupnpc/upnperrors.h>
+#else
+struct UPNPUrls;
+struct IGDdatas;
+#endif
 
 #include <chiaki/remote/holepunch.h>
 #include <chiaki/stoppipe.h>
@@ -788,6 +793,7 @@ CHIAKI_EXPORT Session* chiaki_holepunch_session_init(
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_upnp_discover(Session *session)
 {
+#if CHIAKI_ENABLE_UPNP
     session->gw.data = calloc(1, sizeof(struct IGDdatas));
     if(!session->gw.data)
     {
@@ -811,6 +817,10 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_upnp_discover(Session *session)
         session->gw.urls = NULL;
     }
     return CHIAKI_ERR_SUCCESS;
+#else
+    (void)session;
+    return CHIAKI_ERR_SUCCESS;
+#endif
 }
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_create(Session* session)
@@ -3403,6 +3413,7 @@ static ChiakiErrorCode get_client_addr_local(Session *session, Candidate *local_
  */
 static ChiakiErrorCode upnp_get_gateway_info(ChiakiLog *log, UPNPGatewayInfo *info)
 {
+#if CHIAKI_ENABLE_UPNP
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     int success = 0;
     struct UPNPDev *devlist = upnpDiscover(
@@ -3426,6 +3437,11 @@ static ChiakiErrorCode upnp_get_gateway_info(ChiakiLog *log, UPNPGatewayInfo *in
 cleanup:
     freeUPNPDevlist(devlist);
     return err;
+#else
+    (void)log;
+    (void)info;
+    return CHIAKI_ERR_NETWORK;
+#endif
 }
 
 /**
@@ -3436,12 +3452,19 @@ cleanup:
  */
 static bool get_client_addr_remote_upnp(ChiakiLog *log, UPNPGatewayInfo *gw_info, char* out)
 {
+#if CHIAKI_ENABLE_UPNP
     int res = UPNP_GetExternalIPAddress(
         gw_info->urls->controlURL, gw_info->data->first.servicetype, out);
     bool success = (res == UPNPCOMMAND_SUCCESS);
     if(!success)
         CHIAKI_LOGE(log, "UPNP error getting external IP Address: %s", strupnperror(res));
     return success;
+#else
+    (void)log;
+    (void)gw_info;
+    (void)out;
+    return false;
+#endif
 }
 
 /**
@@ -3455,6 +3478,7 @@ static bool get_client_addr_remote_upnp(ChiakiLog *log, UPNPGatewayInfo *gw_info
 */
 static bool upnp_add_udp_port_mapping(ChiakiLog* log, UPNPGatewayInfo *gw_info, uint16_t port_internal, uint16_t port_external)
 {
+#if CHIAKI_ENABLE_UPNP
     char port_internal_str[6];
     snprintf(port_internal_str, sizeof(port_internal_str), "%d", port_internal);
     char port_external_str[6];
@@ -3468,6 +3492,13 @@ static bool upnp_add_udp_port_mapping(ChiakiLog* log, UPNPGatewayInfo *gw_info, 
     if(!success)
         CHIAKI_LOGE(log, "UPNP error adding port mapping: %s", strupnperror(res));
     return success;
+#else
+    (void)log;
+    (void)gw_info;
+    (void)port_internal;
+    (void)port_external;
+    return false;
+#endif
 }
 
 /**
@@ -3479,6 +3510,7 @@ static bool upnp_add_udp_port_mapping(ChiakiLog* log, UPNPGatewayInfo *gw_info, 
 */
 static bool upnp_delete_udp_port_mapping(ChiakiLog *log, UPNPGatewayInfo *gw_info, uint16_t port_external)
 {
+#if CHIAKI_ENABLE_UPNP
     char port_external_str[6];
     snprintf(port_external_str, sizeof(port_external_str), "%d", port_external);
 
@@ -3489,6 +3521,12 @@ static bool upnp_delete_udp_port_mapping(ChiakiLog *log, UPNPGatewayInfo *gw_inf
     if(!success)
         CHIAKI_LOGE(log, "UPNP error deleting port mapping: %s", strupnperror(res));
     return success;
+#else
+    (void)log;
+    (void)gw_info;
+    (void)port_external;
+    return false;
+#endif
 }
 
 /**

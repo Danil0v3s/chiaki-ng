@@ -14,6 +14,41 @@ if(NOT CHIAKI_USE_SYSTEM_NANOPB)
 	add_library(Nanopb::nanopb ALIAS nanopb)
 endif()
 
+if(CHIAKI_LIB_ENABLE_OPUS AND NOT CHIAKI_USE_SYSTEM_OPUS)
+	##################
+	# opus
+	##################
+
+	set(OPUS_BUILD_TESTING OFF CACHE BOOL "Build Opus tests" FORCE)
+	set(OPUS_BUILD_PROGRAMS OFF CACHE BOOL "Build Opus programs" FORCE)
+	set(OPUS_BUILD_SHARED_LIBRARY OFF CACHE BOOL "Build Opus shared library" FORCE)
+	add_subdirectory(opus EXCLUDE_FROM_ALL)
+endif()
+
+if(CHIAKI_LIB_ENABLE_MBEDTLS AND NOT CHIAKI_LIB_MBEDTLS_EXTERNAL_PROJECT AND NOT CHIAKI_USE_SYSTEM_MBEDTLS)
+	##################
+	# mbedtls
+	##################
+
+	set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbedtls programs" FORCE)
+	set(ENABLE_TESTING OFF CACHE BOOL "Build mbedtls tests" FORCE)
+	set(USE_SHARED_MBEDTLS_LIBRARY OFF CACHE BOOL "Build mbedtls shared libs" FORCE)
+	add_subdirectory(mbedtls EXCLUDE_FROM_ALL)
+endif()
+
+if(CHIAKI_ENABLE_RUDP AND NOT CHIAKI_IS_SWITCH AND NOT CHIAKI_USE_SYSTEM_JSONC)
+	##################
+	# json-c
+	##################
+
+	add_subdirectory(json-c EXCLUDE_FROM_ALL)
+	if(TARGET json-c-static)
+		add_library(JsonC::json-c ALIAS json-c-static)
+	elseif(TARGET json-c)
+		add_library(JsonC::json-c ALIAS json-c)
+	endif()
+endif()
+
 if(NOT CHIAKI_USE_SYSTEM_JERASURE)
 	##################
 	# gf-complete
@@ -64,6 +99,10 @@ if (NOT CHIAKI_IS_SWITCH)
 		set(BUILD_SHARED_LIBS OFF)
 		set(BUILD_STATIC_LIBS ON)
 		set(CURL_DISABLE_INSTALL ON)
+		# curl export target generation fails when libcurl links against vendored mbedtls targets.
+		if(CHIAKI_LIB_ENABLE_MBEDTLS AND NOT CHIAKI_LIB_MBEDTLS_EXTERNAL_PROJECT AND NOT CHIAKI_USE_SYSTEM_MBEDTLS)
+			set(CURL_ENABLE_EXPORT_TARGET OFF CACHE BOOL "Enable CMake export target" FORCE)
+		endif()
 		set(HTTP_ONLY ON)
 		set(ENABLE_WEBSOCKETS ON)
 	if(WIN32)
