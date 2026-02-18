@@ -31,6 +31,8 @@ typedef struct chiaki_opus_decoder_t
 CHIAKI_EXPORT void chiaki_opus_decoder_init(ChiakiOpusDecoder *decoder, ChiakiLog *log);
 CHIAKI_EXPORT void chiaki_opus_decoder_fini(ChiakiOpusDecoder *decoder);
 CHIAKI_EXPORT void chiaki_opus_decoder_get_sink(ChiakiOpusDecoder *decoder, ChiakiAudioSink *sink);
+// Non-inline version to avoid struct layout issues when called from ObjC++
+CHIAKI_EXPORT void chiaki_opus_decoder_get_sink_func(ChiakiOpusDecoder *decoder, ChiakiAudioSinkHeader *header_cb, ChiakiAudioSinkFrame *frame_cb, void **user);
 
 static inline void chiaki_opus_decoder_set_cb(ChiakiOpusDecoder *decoder, ChiakiOpusDecoderSettingsCallback settings_cb, ChiakiOpusDecoderFrameCallback frame_cb, void *user)
 {

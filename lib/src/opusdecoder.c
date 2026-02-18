@@ -40,6 +40,14 @@ CHIAKI_EXPORT void chiaki_opus_decoder_get_sink(ChiakiOpusDecoder *decoder, Chia
 	sink->frame_cb = chiaki_opus_decoder_frame;
 }
 
+// Non-inline version to avoid struct layout issues when called from ObjC++
+CHIAKI_EXPORT void chiaki_opus_decoder_get_sink_func(ChiakiOpusDecoder *decoder, ChiakiAudioSinkHeader *header_cb, ChiakiAudioSinkFrame *frame_cb, void **user)
+{
+	*header_cb = chiaki_opus_decoder_header;
+	*frame_cb = chiaki_opus_decoder_frame;
+	*user = decoder;
+}
+
 static void chiaki_opus_decoder_header(ChiakiAudioHeader *header, void *user)
 {
 	ChiakiOpusDecoder *decoder = user;

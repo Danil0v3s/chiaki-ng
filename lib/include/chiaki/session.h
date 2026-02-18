@@ -321,6 +321,12 @@ static inline void chiaki_session_set_audio_sink(ChiakiSession *session, ChiakiA
 }
 
 /**
+ * Non-inline version to avoid struct layout mismatches across translation units.
+ * Use this from Objective-C++ or other non-C code.
+ */
+CHIAKI_EXPORT void chiaki_session_set_audio_sink_func(ChiakiSession *session, ChiakiAudioSinkHeader header_cb, ChiakiAudioSinkFrame frame_cb, void *user);
+
+/**
  * @param sink contents are copied
  */
 static inline void chiaki_session_set_haptics_sink(ChiakiSession *session, ChiakiAudioSink *sink)

@@ -343,6 +343,13 @@ CHIAKI_EXPORT void chiaki_session_set_event_cb_func(ChiakiSession *session, Chia
 	session->event_cb_user = user;
 }
 
+CHIAKI_EXPORT void chiaki_session_set_audio_sink_func(ChiakiSession *session, ChiakiAudioSinkHeader header_cb, ChiakiAudioSinkFrame frame_cb, void *user)
+{
+	session->audio_sink.user = user;
+	session->audio_sink.header_cb = header_cb;
+	session->audio_sink.frame_cb = frame_cb;
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
 	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
