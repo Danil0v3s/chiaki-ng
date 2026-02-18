@@ -294,11 +294,23 @@ static inline void chiaki_session_set_event_cb(ChiakiSession *session, ChiakiEve
 	session->event_cb_user = user;
 }
 
+/**
+ * Non-inline version to avoid struct layout mismatches across translation units.
+ * Use this from Objective-C++ or other non-C code.
+ */
+CHIAKI_EXPORT void chiaki_session_set_event_cb_func(ChiakiSession *session, ChiakiEventCallback cb, void *user);
+
 static inline void chiaki_session_set_video_sample_cb(ChiakiSession *session, ChiakiVideoSampleCallback cb, void *user)
 {
 	session->video_sample_cb = cb;
 	session->video_sample_cb_user = user;
 }
+
+/**
+ * Non-inline version to avoid struct layout mismatches across translation units.
+ * Use this from Objective-C++ or other non-C code.
+ */
+CHIAKI_EXPORT void chiaki_session_set_video_sample_cb_func(ChiakiSession *session, ChiakiVideoSampleCallback cb, void *user);
 
 /**
  * @param sink contents are copied

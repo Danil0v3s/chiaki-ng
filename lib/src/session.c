@@ -331,6 +331,18 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_join(ChiakiSession *session)
 	return chiaki_thread_join(&session->session_thread, NULL);
 }
 
+CHIAKI_EXPORT void chiaki_session_set_video_sample_cb_func(ChiakiSession *session, ChiakiVideoSampleCallback cb, void *user)
+{
+	session->video_sample_cb = cb;
+	session->video_sample_cb_user = user;
+}
+
+CHIAKI_EXPORT void chiaki_session_set_event_cb_func(ChiakiSession *session, ChiakiEventCallback cb, void *user)
+{
+	session->event_cb = cb;
+	session->event_cb_user = user;
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
 	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);

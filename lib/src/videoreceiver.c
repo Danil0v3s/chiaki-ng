@@ -107,8 +107,26 @@ CHIAKI_EXPORT void chiaki_video_receiver_av_packet(ChiakiVideoReceiver *video_re
 
 		ChiakiVideoProfile *profile = video_receiver->profiles + video_receiver->profile_cur;
 		CHIAKI_LOGI(video_receiver->log, "Switched to profile %d, resolution: %ux%u", video_receiver->profile_cur, profile->width, profile->height);
-		if(video_receiver->session->video_sample_cb)
-			video_receiver->session->video_sample_cb(profile->header, profile->header_sz, 0, false, video_receiver->session->video_sample_cb_user);
+		ChiakiSession *sess = video_receiver->session;
+		if(sess)
+		{
+			ChiakiVideoSampleCallback cb = sess->video_sample_cb;
+			void *cb_user = sess->video_sample_cb_user;
+			CHIAKI_LOGI(video_receiver->log, "VideoReceiver: session=%p, cb=%p, user=%p", (void*)sess, (void*)cb, cb_user);
+			if(cb)
+			{
+				CHIAKI_LOGI(video_receiver->log, "VideoReceiver: Calling callback with header size=%zu", profile->header_sz);
+				cb(profile->header, profile->header_sz, 0, false, cb_user);
+			}
+			else
+			{
+				CHIAKI_LOGW(video_receiver->log, "VideoReceiver: video_sample_cb is NULL!");
+			}
+		}
+		else
+		{
+			CHIAKI_LOGE(video_receiver->log, "VideoReceiver: session pointer is NULL!");
+		}
 		if(!chiaki_bitstream_header(&video_receiver->bitstream, profile->header, profile->header_sz))
 			CHIAKI_LOGW(video_receiver->log, "Failed to parse video header");
 	}
