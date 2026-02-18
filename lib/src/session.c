@@ -171,6 +171,11 @@ CHIAKI_EXPORT const char *chiaki_quit_reason_string(ChiakiQuitReason reason)
 	}
 }
 
+CHIAKI_EXPORT size_t chiaki_session_get_size(void)
+{
+	return sizeof(ChiakiSession);
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, ChiakiConnectInfo *connect_info,
 	ChiakiLog *log)
 {

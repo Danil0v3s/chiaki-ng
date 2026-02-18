@@ -272,6 +272,13 @@ typedef struct chiaki_session_t
 	ChiakiControllerState controller_state;
 } ChiakiSession;
 
+/**
+ * Get the size of ChiakiSession struct as seen by the C library.
+ * Use this to allocate memory for ChiakiSession from other languages
+ * to avoid struct layout mismatches.
+ */
+CHIAKI_EXPORT size_t chiaki_session_get_size(void);
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, ChiakiConnectInfo *connect_info, ChiakiLog *log);
 CHIAKI_EXPORT void chiaki_session_fini(ChiakiSession *session);
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_start(ChiakiSession *session);
